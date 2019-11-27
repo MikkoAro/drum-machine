@@ -1,27 +1,20 @@
+import 'package:drum_machine/screens/MainUI.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'screens/Sequencer.dart';
-import 'dart:convert';
 import 'dart:async';
 import 'size_config.dart';
 
-AudioCache player = AudioCache(prefix: 'audio/');
 AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-var seq1;
-var seq2;
-var seq3;
-var seq4;
-var seq5;
-var seq6;
-var seq7;
-var seq8;
+AudioCache player = AudioCache(prefix: 'audio/');
 
 class Pad extends StatelessWidget {
   final _text;
   final _localPath;
   final _soundNumber;
-  Pad(this._text, this._localPath, this._soundNumber);
+  final _testSequencer;
+  Pad(this._text, this._localPath, this._soundNumber, this._testSequencer);
 
   Widget build(BuildContext context) {
     player.loadAll([
@@ -34,7 +27,7 @@ class Pad extends StatelessWidget {
       'Snare.wav',
       'Snare2.wav',
     ]);
-    ;
+
     return RaisedButton(
         padding: EdgeInsets.zero,
         splashColor: Colors.transparent,
@@ -43,7 +36,7 @@ class Pad extends StatelessWidget {
         child: GestureDetector(
             onTapDown: (_) => player.play(_localPath, volume: 1.0),
             onLongPress: () {
-              _navigation(context, _soundNumber);
+              _navigation(context, _soundNumber, _testSequencer);
             },
             child: Container(
                 color: Colors.white12,
@@ -76,88 +69,67 @@ class PlayButton extends StatelessWidget {
   }
 }
 
-_navigation(BuildContext context, _soundNumber) async {
-  final result = await Navigator.push(
+_navigation(BuildContext context, _soundNumber, _testSequencer) async {
+  Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => Sequencer(_soundNumber)),
+    MaterialPageRoute(
+        builder: (context) => Sequencer(_soundNumber, _testSequencer)),
   );
-  parseData(result);
-  print(result);
-}
-
-parseData(json) {
-  var parsedJson = jsonDecode(json);
-  seq1 = parsedJson['seq1'];
-  seq2 = parsedJson['seq2'];
-  seq3 = parsedJson['seq3'];
-  seq4 = parsedJson['seq4'];
-  seq5 = parsedJson['seq5'];
-  seq6 = parsedJson['seq6'];
-  seq7 = parsedJson['seq7'];
-  seq8 = parsedJson['seq8'];
 }
 
 play() {
-  var parsedSeq1 = json.decode(seq1);
-  var parsedSeq2 = json.decode(seq2);
-  var parsedSeq3 = json.decode(seq3);
-  var parsedSeq4 = json.decode(seq4);
-  var parsedSeq5 = json.decode(seq5);
-  var parsedSeq6 = json.decode(seq6);
-  var parsedSeq7 = json.decode(seq7);
-  var parsedSeq8 = json.decode(seq8);
   var index = 1;
 
   Timer.run(() {
-    if (parsedSeq1[0]) {
+    if (testSequencer1[0]) {
       player.play("Kick.wav");
     }
-    if (parsedSeq2[0]) {
+    if (testSequencer2[0]) {
       player.play("Snare.wav");
     }
-    if (parsedSeq3[0]) {
+    if (testSequencer3[0]) {
       player.play("Snare2.wav");
     }
-    if (parsedSeq4[0]) {
+    if (testSequencer4[0]) {
       player.play("Hihat2.wav");
     }
-    if (parsedSeq5[0]) {
+    if (testSequencer5[0]) {
       player.play("Clap.wav");
     }
-    if (parsedSeq6[0]) {
+    if (testSequencer6[0]) {
       player.play("Bass.wav");
     }
-    if (parsedSeq7[0]) {
+    if (testSequencer7[0]) {
       player.play("Keys.wav");
     }
-    if (parsedSeq8[0]) {
+    if (testSequencer8[0]) {
       player.play("Hihat.wav");
     }
   });
 
   Timer.periodic(Duration(milliseconds: 250), (timer) {
-    if (parsedSeq1[index]) {
+    if (testSequencer1[index]) {
       player.play("Kick.wav");
     }
-    if (parsedSeq2[index]) {
+    if (testSequencer2[index]) {
       player.play("Snare.wav");
     }
-    if (parsedSeq3[index]) {
+    if (testSequencer3[index]) {
       player.play("Snare2.wav");
     }
-    if (parsedSeq4[index]) {
+    if (testSequencer4[index]) {
       player.play("Hihat2.wav");
     }
-    if (parsedSeq5[index]) {
+    if (testSequencer5[index]) {
       player.play("Clap.wav");
     }
-    if (parsedSeq6[index]) {
+    if (testSequencer6[index]) {
       player.play("Bass.wav");
     }
-    if (parsedSeq7[index]) {
+    if (testSequencer7[index]) {
       player.play("Keys.wav");
     }
-    if (parsedSeq8[index]) {
+    if (testSequencer8[index]) {
       player.play("Hihat.wav");
     }
     index++;
