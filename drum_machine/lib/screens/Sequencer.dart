@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 // SEQUENCER UI
 class Sequencer extends StatelessWidget {
   final int _soundNumber;
-  final List _testSequencer;
-  Sequencer(this._soundNumber, this._testSequencer);
+  final List _sequencer;
+  Sequencer(this._soundNumber, this._sequencer);
   @override
   Widget build(BuildContext context) {
     //passValue(_soundNumber);
@@ -25,22 +25,22 @@ class Sequencer extends StatelessWidget {
               mainAxisSpacing: 10,
               crossAxisCount: 8,
               children: <Widget>[
-                StepSeq(buttonId: 0, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 1, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 2, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 3, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 4, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 5, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 6, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 7, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 8, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 9, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 10, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 11, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 12, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 13, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 14, sound: _soundNumber, seq: _testSequencer),
-                StepSeq(buttonId: 15, sound: _soundNumber, seq: _testSequencer),
+                StepSeq(buttonId: 0, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 1, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 2, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 3, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 4, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 5, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 6, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 7, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 8, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 9, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 10, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 11, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 12, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 13, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 14, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 15, sound: _soundNumber, seq: _sequencer),
                 RaisedButton(
                   shape: RoundedRectangleBorder(
                       side: BorderSide(color: Colors.black87)),
@@ -50,7 +50,7 @@ class Sequencer extends StatelessWidget {
                 RaisedButton(
                     shape: RoundedRectangleBorder(
                         side: BorderSide(color: Colors.black87)),
-                    onPressed: () => _resetSequencer(_testSequencer),
+                    onPressed: () => _resetSequencer(_sequencer),
                     child: Text(
                       "Reset",
                       style: new TextStyle(fontSize: 10.0),

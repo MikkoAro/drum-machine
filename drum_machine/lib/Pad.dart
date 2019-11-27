@@ -13,8 +13,8 @@ class Pad extends StatelessWidget {
   final _text;
   final _localPath;
   final _soundNumber;
-  final _testSequencer;
-  Pad(this._text, this._localPath, this._soundNumber, this._testSequencer);
+  final _sequencer;
+  Pad(this._text, this._localPath, this._soundNumber, this._sequencer);
 
   Widget build(BuildContext context) {
     player.loadAll([
@@ -36,7 +36,7 @@ class Pad extends StatelessWidget {
         child: GestureDetector(
             onTapDown: (_) => player.play(_localPath, volume: 1.0),
             onLongPress: () {
-              _navigation(context, _soundNumber, _testSequencer);
+              _navigation(context, _soundNumber, _sequencer);
             },
             child: Container(
                 color: Colors.white12,
@@ -69,11 +69,11 @@ class PlayButton extends StatelessWidget {
   }
 }
 
-_navigation(BuildContext context, _soundNumber, _testSequencer) async {
+_navigation(BuildContext context, _soundNumber, _sequencer) async {
   Navigator.push(
     context,
     MaterialPageRoute(
-        builder: (context) => Sequencer(_soundNumber, _testSequencer)),
+        builder: (context) => Sequencer(_soundNumber, _sequencer)),
   );
 }
 
@@ -81,55 +81,55 @@ play() {
   var index = 1;
 
   Timer.run(() {
-    if (testSequencer1[0]) {
+    if (sequencer1[0]) {
       player.play("Kick.wav");
     }
-    if (testSequencer2[0]) {
+    if (sequencer2[0]) {
       player.play("Snare.wav");
     }
-    if (testSequencer3[0]) {
+    if (sequencer3[0]) {
       player.play("Snare2.wav");
     }
-    if (testSequencer4[0]) {
+    if (sequencer4[0]) {
       player.play("Hihat2.wav");
     }
-    if (testSequencer5[0]) {
+    if (sequencer5[0]) {
       player.play("Clap.wav");
     }
-    if (testSequencer6[0]) {
+    if (sequencer6[0]) {
       player.play("Bass.wav");
     }
-    if (testSequencer7[0]) {
+    if (sequencer7[0]) {
       player.play("Keys.wav");
     }
-    if (testSequencer8[0]) {
+    if (sequencer8[0]) {
       player.play("Hihat.wav");
     }
   });
 
   Timer.periodic(Duration(milliseconds: 250), (timer) {
-    if (testSequencer1[index]) {
+    if (sequencer1[index]) {
       player.play("Kick.wav");
     }
-    if (testSequencer2[index]) {
+    if (sequencer2[index]) {
       player.play("Snare.wav");
     }
-    if (testSequencer3[index]) {
+    if (sequencer3[index]) {
       player.play("Snare2.wav");
     }
-    if (testSequencer4[index]) {
+    if (sequencer4[index]) {
       player.play("Hihat2.wav");
     }
-    if (testSequencer5[index]) {
+    if (sequencer5[index]) {
       player.play("Clap.wav");
     }
-    if (testSequencer6[index]) {
+    if (sequencer6[index]) {
       player.play("Bass.wav");
     }
-    if (testSequencer7[index]) {
+    if (sequencer7[index]) {
       player.play("Keys.wav");
     }
-    if (testSequencer8[index]) {
+    if (sequencer8[index]) {
       player.play("Hihat.wav");
     }
     index++;
