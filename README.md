@@ -1,7 +1,7 @@
 # Drum machine v0.8
 
 Mobile Application development - Harjoitustyö  
-Tekijä: Mikko Aro
+Tekijä: Mikko Aro  
 Viimeisin päivitys: 8.12.2019 (uusia ominaisuuksia, database, pidempi sekvensseri, UI-muutoksia)
 
 ## Tietoa ohjelmasta
