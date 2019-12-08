@@ -1,7 +1,8 @@
-# Drum machine v0.5
+# Drum machine v0.8
 
 Mobile Application development - Harjoitustyö  
 Tekijä: Mikko Aro
+Viimeisin päivitys: 8.12.2019 (uusia ominaisuuksia, database, pidempi sekvensseri, UI-muutoksia)
 
 ## Tietoa ohjelmasta
 
@@ -9,8 +10,6 @@ Sovellus on yksinkertainen rumpukone, jota tulen jatkokehittämään vielä *Mob
 Sovelluksella on "soitto"-osio, sekä sekvensseri. Toisinsanoen ensimmäisessä ruudussa voidaan soittaa sovelluksessa olevia rumpuääniä (sampleja), ja toisessa ruudussa voidaan ohjelmoida ohjelma soittamaan kyseiset äänet tietyssä rytmissä.
 
 Sovellus on kehitetty Flutter-mobiilikehitystyökalulla, ohjelmointikielenä Dart.
-
-Linkki demovideoon [youtube](https://www.youtube.com/watch?v=yqxOk7aWAEs).
 
 ## Käyttöliittymä
 
