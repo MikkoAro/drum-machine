@@ -18,10 +18,10 @@ initDatabase() async {
   });
 }
 
-table(patternData) async {
+checkId(patternData) async {
   List<Map> set = await database.rawQuery('SELECT id FROM Pattern');
   String idTable = set.toString();
-
+  //TODO make it beautiful
   if (!idTable.contains('1}')) {
     insert(patternData, 1);
   } else if (!idTable.contains('2')) {
@@ -43,16 +43,18 @@ table(patternData) async {
   } else if (!idTable.contains('10')) {
     insert(patternData, 10);
   } else {
-    saveFailedToaster();
+    infoToaster("No free slots for saving");
   }
 }
 
 insert(patternData, id) async {
+
   await database.transaction((txn) async {
     await txn.rawInsert(
         "INSERT INTO Pattern(id, pattern) VALUES($id, '$patternData')");
-    saveToaster(id);
+    infoToaster("Saved on slot $id");
   });
+  print(id.toString() + patternData);
 }
 
 Future<List<Map>> fetch(id) async {
@@ -61,6 +63,7 @@ Future<List<Map>> fetch(id) async {
   return list;
 }
 
-deleteTable(id) {
+deleteSlot(id) {
   database.rawQuery('DELETE FROM pattern WHERE id=$id');
+  infoToaster("Deleted slot $id");
 }

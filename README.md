@@ -1,19 +1,32 @@
-# Drum machine v0.8
+# Drum machine v1.0
 
 Mobile Application development - Harjoitustyö  
 Tekijä: Mikko Aro  
-Viimeisin päivitys: 8.12.2019 (uusia ominaisuuksia, database, pidempi sekvensseri, UI-muutoksia)
+Arvosana: 5  
+Päivitetty 16.12.2019
 
-## Tietoa ohjelmasta
+## Info
 
-Sovellus on kehitetty Flutter-mobiilikehitystyökalulla, ohjelmointikielenä Dart, tietokantana on käytetty SQLiteä.
+Coded with Flutter + Dart  
 
-## Käyttöliittymä
+Features:
+
+- Play samples (asset/recorded)
+- Record audio as .wav to external storage folder
+- Make rhythmn patterns with sequencer
+- Save rhythmns in SQLite-database
+    - 10 slots for saving
+    - Save/Load/Delete
+
+Demonstration video link to [youtube](https://youtu.be/twkhECjTBog)
+
+## User Interface
 
 ![Screen 1](Docs/Screen1.PNG)
-*Kuva: Aloitusnäkymä ("soitto"-osio)*  
-Sovelluksen aloitusnäkymä. Soitto-osio ja tietokantatoiminnot.  
+Main screen
 
 ![Screen 2](Docs/Screen2.PNG)
-*Kuva: Sekvensserinäkymä*  
-Sekvensserinäkymässä luodaan ääniä soittava rytmi.  
+Sequencer screen
+
+![UML](Docs/UML.PNG)
+App structure (from Powerpoint presentation)

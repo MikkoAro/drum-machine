@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Sequencer extends StatelessWidget {
-  final int _soundNumber;
   final List _sequencer;
-  Sequencer(this._soundNumber, this._sequencer);
+  Sequencer(this._sequencer);
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -12,7 +11,7 @@ class Sequencer extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: AssetImage("assets/images/backgrd.jpg"),
+              image: AssetImage("assets/images/backgrd.JPG"),
               fit: BoxFit.cover),
         ),
         child: ListView(
@@ -27,38 +26,38 @@ class Sequencer extends StatelessWidget {
               childAspectRatio: itemWidth / itemHeight,
               crossAxisCount: 8,
               children: <Widget>[
-                StepSeq(buttonId: 0, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 1, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 2, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 3, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 4, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 5, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 6, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 7, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 8, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 9, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 10, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 11, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 12, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 13, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 14, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 15, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 16, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 17, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 18, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 19, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 20, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 21, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 22, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 23, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 24, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 25, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 26, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 27, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 28, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 29, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 30, sound: _soundNumber, seq: _sequencer),
-                StepSeq(buttonId: 31, sound: _soundNumber, seq: _sequencer),
+                StepSeq(buttonId: 0, seq: _sequencer),
+                StepSeq(buttonId: 1, seq: _sequencer),
+                StepSeq(buttonId: 2, seq: _sequencer),
+                StepSeq(buttonId: 3, seq: _sequencer),
+                StepSeq(buttonId: 4, seq: _sequencer),
+                StepSeq(buttonId: 5, seq: _sequencer),
+                StepSeq(buttonId: 6, seq: _sequencer),
+                StepSeq(buttonId: 7, seq: _sequencer),
+                StepSeq(buttonId: 8, seq: _sequencer),
+                StepSeq(buttonId: 9, seq: _sequencer),
+                StepSeq(buttonId: 10, seq: _sequencer),
+                StepSeq(buttonId: 11, seq: _sequencer),
+                StepSeq(buttonId: 12, seq: _sequencer),
+                StepSeq(buttonId: 13, seq: _sequencer),
+                StepSeq(buttonId: 14, seq: _sequencer),
+                StepSeq(buttonId: 15, seq: _sequencer),
+                StepSeq(buttonId: 16, seq: _sequencer),
+                StepSeq(buttonId: 17, seq: _sequencer),
+                StepSeq(buttonId: 18, seq: _sequencer),
+                StepSeq(buttonId: 19, seq: _sequencer),
+                StepSeq(buttonId: 20, seq: _sequencer),
+                StepSeq(buttonId: 21, seq: _sequencer),
+                StepSeq(buttonId: 22, seq: _sequencer),
+                StepSeq(buttonId: 23, seq: _sequencer),
+                StepSeq(buttonId: 24, seq: _sequencer),
+                StepSeq(buttonId: 25, seq: _sequencer),
+                StepSeq(buttonId: 26, seq: _sequencer),
+                StepSeq(buttonId: 27, seq: _sequencer),
+                StepSeq(buttonId: 28, seq: _sequencer),
+                StepSeq(buttonId: 29, seq: _sequencer),
+                StepSeq(buttonId: 30, seq: _sequencer),
+                StepSeq(buttonId: 31, seq: _sequencer),
               ],
             ),
             Center(
@@ -76,9 +75,8 @@ class Sequencer extends StatelessWidget {
 
 class StepSeq extends StatefulWidget {
   final int buttonId;
-  final int sound;
   final List seq;
-  StepSeq({@required this.buttonId, @required this.sound, @required this.seq});
+  StepSeq({@required this.buttonId, @required this.seq});
   _StepState createState() => _StepState();
 }
 

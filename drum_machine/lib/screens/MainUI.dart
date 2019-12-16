@@ -1,20 +1,26 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:audio_recorder/audio_recorder.dart';
 import '../SQLite.dart';
 import 'Sequencer.dart';
+import 'dart:io' as io;
 
-AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
 AudioCache player = AudioCache(prefix: 'audio/');
+final MethodChannel _channel =
+    MethodChannel('plugins.flutter.io/path_provider');
 
 class MainUI extends StatefulWidget {
   _MainState createState() => _MainState();
 }
+
+
 
 class _MainState extends State<MainUI> {
   List sequencer1 = List<dynamic>.filled(32, false);
@@ -25,6 +31,14 @@ class _MainState extends State<MainUI> {
   List sequencer6 = List<dynamic>.filled(32, false);
   List sequencer7 = List<dynamic>.filled(32, false);
   List sequencer8 = List<dynamic>.filled(32, false);
+  String sound1 = "Kick.wav";
+  String sound2 = "Snare.wav";
+  String sound3 = "Snare2.wav";
+  String sound4 = "Hihat2.wav";
+  String sound5 = "Pad1.wav";
+  String sound6 = "Pad2.wav";
+  String sound7 = "Keys.wav";
+  String sound8 = "Hihat.wav";
   int id = 1;
   @override
   Widget build(BuildContext context) {
@@ -32,10 +46,11 @@ class _MainState extends State<MainUI> {
     var size = MediaQuery.of(context).size;
     final double itemHeight = size.height / 0.62;
     final double itemWidth = size.width;
+
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: AssetImage("assets/images/backgrd.jpg"), fit: BoxFit.cover),
+            image: AssetImage("assets/images/backgrd.JPG"), fit: BoxFit.cover),
       ),
       child: ListView(shrinkWrap: false, children: <Widget>[
         GridView.count(
@@ -47,23 +62,25 @@ class _MainState extends State<MainUI> {
           crossAxisCount: 4,
           childAspectRatio: itemWidth / itemHeight,
           children: <Widget>[
-            Pad("Kick", "Kick.wav", 1, sequencer1),
-            Pad("Snare", "Snare.wav", 2, sequencer2),
-            Pad("Snare", "Snare2.wav", 3, sequencer3),
-            Pad("Hi-hat", "Hihat2.wav", 4, sequencer4),
-            Pad("Clap", "Clap.wav", 5, sequencer5),
-            Pad("Bass", "Bass.wav", 6, sequencer6),
-            Pad("Keys", "Keys.wav", 7, sequencer7),
-            Pad("Hi-hat", "Hihat.wav", 8, sequencer8),
+            Pad(sound1, sequencer1, this, 0),
+            Pad(sound2, sequencer2, this, 1),
+            Pad(sound3, sequencer3, this, 2),
+            Pad(sound4, sequencer4, this, 3),
+            Pad(sound5, sequencer5, this, 4),
+            Pad(sound6, sequencer6, this, 5),
+            Pad(sound7, sequencer7, this, 6),
+            Pad(sound8, sequencer8, this, 7),
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            PlayButton(sequencer1, sequencer2, sequencer3, sequencer4,
-                sequencer5, sequencer6, sequencer7, sequencer8),
-            ResetButton(sequencer1, sequencer2, sequencer3, sequencer4,
-                sequencer5, sequencer6, sequencer7, sequencer8, this),
+            PlayButton(sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8,
+                sound1,sound2,sound3,sound4,sound5,sound6,sound7,sound8),
+            ResetButton(
+                sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8,
+                this,
+                sound1,sound2,sound3,sound4,sound5,sound6,sound7,sound8),
             DatabaseContainer(sequencer1, sequencer2, sequencer3, sequencer4,
                 sequencer5, sequencer6, sequencer7, sequencer8, this, id),
           ],
@@ -74,51 +91,221 @@ class _MainState extends State<MainUI> {
   }
 }
 
-//Pad
-class Pad extends StatelessWidget {
-  final _text;
-  final _localPath;
-  final _soundNumber;
-  final _sequencer;
-
-  Pad(this._text, this._localPath, this._soundNumber, this._sequencer);
-
-  Widget build(BuildContext context) {
-    player.loadAll([
-      'Bass.wav',
-      'Clap.wav',
-      'Hihat.wav',
-      'Hihat2.wav',
-      'Keys.wav',
-      'Kick.wav',
-      'Snare.wav',
-      'Snare2.wav',
-    ]);
-    return RaisedButton(
-        padding: EdgeInsets.zero,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.lightBlue,
-        onPressed: () {},
-        child: GestureDetector(
-            onTapDown: (_) => player.play(_localPath, volume: 1.0),
-            onLongPress: () {
-              _navigation(context, _soundNumber, _sequencer);
-            },
-            child: Container(
-                color: Colors.white12,
-                child: Center(
-                  child: Text(_text,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16)),
-                ))));
+initDatabase() {
+  if (path == null) {
+    getPath();
   }
 }
 
-_navigation(BuildContext context, _soundNumber, _sequencer) async {
+class Pad extends StatelessWidget {
+  final _sound;
+  final _sequencer;
+  final _MainState parent;
+  final recButtonId;
+
+  Pad(this._sound, this._sequencer, this.parent, this.recButtonId);
+
+  Widget build(BuildContext context) {
+    return Container(
+      child: Stack(children: <Widget>[
+        RaisedButton(
+            padding: EdgeInsets.zero,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.lightBlue,
+            onPressed: () {},
+            child: GestureDetector(
+                onTapDown: (_) => onTapDownPlay(_sound),
+                onLongPress: () {
+                  _navigation(context, _sequencer);
+                },
+                child: Container(
+                  color: Colors.white12,
+                  child: Center(
+                    child: Text(_sound.replaceAll(RegExp('.wav'), ''),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16)),
+                  ),
+                ))),
+        RecButton(parent, recButtonId),
+      ]),
+    );
+  }
+}
+
+onTapDownPlay(_sound) {
+  if (_sound.contains('REC')) {
+    String recordingPath =
+        '/storage/emulated/0/Android/data/com.example.drum_machine/files/$_sound.wav';
+    AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+    audioPlayer.play(recordingPath, isLocal: true, volume: 1.0);
+  } else {
+    player.play(_sound, volume: 1.0);
+  }
+}
+
+class RecButton extends StatefulWidget {
+  final parent;
+  final recButtonId;
+
+  RecButton(this.parent, this.recButtonId);
+  _RecState createState() => _RecState();
+}
+
+class _RecState extends State<RecButton> {
+  List rec = List<dynamic>.filled(8, 1);
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+        alignment: Alignment.bottomRight,
+        child: Container(
+            decoration: BoxDecoration(border: Border.all(width: 1)),
+            height: 30,
+            width: 34,
+            child: GestureDetector(
+                onLongPress: () {
+                  startRecord();
+                },
+                onLongPressUp: () {
+                  stopRecord();
+                },
+                onDoubleTap: () {
+                  changeSound(widget.parent, widget.recButtonId, rec);
+                },
+                child: Padding(
+                    padding: EdgeInsets.all(2.5),
+                    child: FloatingActionButton(
+                      onPressed: () => {},
+                      heroTag: null,
+                      backgroundColor: Colors.red,
+                    )))));
+  }
+}
+
+startRecord() async {
+  int rec = 1;
+  if (await AudioRecorder.hasPermissions) {
+    path = await getExternalStorageDirectory();
+    if (await io.File(path + '/REC$rec.wav').exists()) {
+      int add = 1;
+      while (await io.File(path + '/REC$rec.wav').exists()) {
+        rec++;
+        add++;
+      }
+      infoToaster("Recording started...");
+      await AudioRecorder.start(
+          path: '$path/REC$add', audioOutputFormat: AudioOutputFormat.WAV);
+    } else {
+      infoToaster("Recording started...");
+      await AudioRecorder.start(
+          path: '$path/REC$rec', audioOutputFormat: AudioOutputFormat.WAV);
+    }
+  } else {
+    infoToaster("ERROR: Permission denied from the settings");
+  }
+}
+
+stopRecord() async {
+  Recording recording = await AudioRecorder.stop();
+  String recName = (recording.path
+      .replaceAll(RegExp(await getExternalStorageDirectory() + '/'), ''));
+  infoToaster("Saved as $recName");
+  print(
+      "Path : ${recording.path},  Format : ${recording.audioOutputFormat},  Duration : ${recording.duration},  Extension : ${recording.extension},");
+}
+
+changeSound(parent, recButtonId, rec) async {
+  String path = '';
+  if (path == '') {
+    path = await getExternalStorageDirectory();
+  }
+  loopSounds(parent, path, recButtonId, rec);
+}
+
+loopSounds(parent, path, i, rec) async {
+  if (await io.File(path + '/REC' + rec[i].toString() + '.wav').exists()) {
+    parent.setState(() {
+      switch (i) {
+        case 0:{
+            parent.sound1 = 'REC' + rec[i].toString();
+          }break;
+        case 1:{
+            parent.sound2 = 'REC' + rec[i].toString();
+          }break;
+        case 2:{
+            parent.sound3 = 'REC' + rec[i].toString();
+          }break;
+        case 3:{
+            parent.sound4 = 'REC' + rec[i].toString();
+          }break;
+        case 4:{
+            parent.sound5 = 'REC' + rec[i].toString();
+          }break;
+        case 5:{
+            parent.sound6 = 'REC' + rec[i].toString();
+          }break;
+        case 6:{
+            parent.sound7 = 'REC' + rec[i].toString();
+          }break;
+        case 7:{
+            parent.sound8 = 'REC' + rec[i].toString();
+          }break;
+      }
+    });
+    rec[i]++;
+  } else {
+    parent.setState(() {
+      switch (i) {
+        case 0:{
+            parent.sound1 = "Kick.wav";
+            rec[i] = 1;
+          }break;
+        case 1:{
+            parent.sound2 = "Snare.wav";
+            rec[i] = 1;
+          } break;
+        case 2:{
+            parent.sound3 = "Snare2.wav";
+            rec[i] = 1;
+          }break;
+        case 3:{
+            parent.sound4 = "Hihat.wav";
+            rec[i] = 1;
+          }break;
+        case 4:{
+            parent.sound5 = "Pad1.wav";
+            rec[i] = 1;
+          }break;
+        case 5:{
+            parent.sound6 = "Pad2.wav";
+            rec[i] = 1;
+          }break;
+        case 6:{
+            parent.sound7 = "Keys.wav";
+            rec[i] = 1;
+          }break;
+        case 7:{
+            parent.sound8 = "Hihat2.wav";
+            rec[i] = 1;
+          }break;
+      }
+    });
+  }
+}
+
+//path = 'storage/emulated/0/Android/data/com.example.drum_machine/files'
+Future<String> getExternalStorageDirectory() async {
+  final String path =
+      await _channel.invokeMethod<String>('getStorageDirectory');
+  if (path == null) {
+    return null;
+  }
+  return path;
+}
+
+_navigation(BuildContext context, _sequencer) async {
   Navigator.push(
     context,
-    MaterialPageRoute(
-        builder: (context) => Sequencer(_soundNumber, _sequencer)),
+    MaterialPageRoute(builder: (context) => Sequencer(_sequencer)),
   );
 }
 
@@ -160,24 +347,18 @@ class DatabaseContainer extends StatelessWidget {
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              ExportButton(sequencer1, sequencer2, sequencer3, sequencer4,
+              SaveButton(sequencer1, sequencer2, sequencer3, sequencer4,
                   sequencer5, sequencer6, sequencer7, sequencer8),
-              Fetch(parent, id),
+              LoadButton(parent, id),
               MinusButton(parent),
-              TextId(id),
+              DatabaseTextId(id),
               PlusButton(parent),
               DeleteButton(id),
             ]));
   }
 }
 
-initDatabase() {
-  if (path == null) {
-    getPath();
-  }
-}
-
-class ExportButton extends StatelessWidget {
+class SaveButton extends StatelessWidget {
   final seq1;
   final seq2;
   final seq3;
@@ -187,7 +368,7 @@ class ExportButton extends StatelessWidget {
   final seq7;
   final seq8;
 
-  ExportButton(this.seq1, this.seq2, this.seq3, this.seq4, this.seq5, this.seq6,
+  SaveButton(this.seq1, this.seq2, this.seq3, this.seq4, this.seq5, this.seq6,
       this.seq7, this.seq8);
 
   Widget build(BuildContext context) {
@@ -211,38 +392,13 @@ class ExportButton extends StatelessWidget {
 export(seq1, seq2, seq3, seq4, seq5, seq6, seq7, seq8) {
   String pattern =
       '"seq1": $seq1, "seq2": $seq2, "seq3": $seq3, "seq4": $seq4, "seq5": $seq5, "seq6": $seq6, "seq7": $seq7, "seq8": $seq8';
-  //insert(pattern);
-  table(pattern);
-  print(pattern);
-  print(path);
+  checkId(pattern);
 }
 
-saveToaster(id) {
-  Fluttertoast.showToast(
-      msg: "Saved on slot $id",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIos: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white70,
-      fontSize: 16.0);
-}
-
-saveFailedToaster() {
-  Fluttertoast.showToast(
-      msg: "No free slots for saving",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIos: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white70,
-      fontSize: 16.0);
-}
-
-class Fetch extends StatelessWidget {
+class LoadButton extends StatelessWidget {
   final _MainState parent;
   final id;
-  Fetch(this.parent, this.id);
+  LoadButton(this.parent, this.id);
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -268,8 +424,9 @@ fetchSet(parent, id) async {
     var data = dbData[0].toString();
     var temp = data.replaceAll(RegExp('pattern:'), '');
     setParent(parent, temp);
+    infoToaster("Loaded from slot $id");
   } else {
-    loadFailToaster();
+    infoToaster("Load failed: empty slot");
   }
 }
 
@@ -293,17 +450,6 @@ setParent(parent, temp) {
     parent.sequencer7 = temp7;
     parent.sequencer8 = temp8;
   });
-}
-
-loadFailToaster() {
-  Fluttertoast.showToast(
-      msg: "Load failed: empty slot",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIos: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white70,
-      fontSize: 16.0);
 }
 
 class MinusButton extends StatelessWidget {
@@ -335,9 +481,9 @@ minus(parent) {
   }
 }
 
-class TextId extends StatelessWidget {
+class DatabaseTextId extends StatelessWidget {
   final id;
-  TextId(this.id);
+  DatabaseTextId(this.id);
   Widget build(BuildContext context) {
     return Container(
         height: 36,
@@ -410,22 +556,17 @@ class DeleteButton extends StatelessWidget {
 }
 
 delete(id) {
-  deleteTable(id);
+  deleteSlot(id);
 }
 
 //Play
 class PlayButton extends StatelessWidget {
-  final sequencer1;
-  final sequencer2;
-  final sequencer3;
-  final sequencer4;
-  final sequencer5;
-  final sequencer6;
-  final sequencer7;
-  final sequencer8;
+  final sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8;
+  final sound1,sound2,sound3,sound4,sound5,sound6,sound7,sound8;
 
-  PlayButton(this.sequencer1, this.sequencer2, this.sequencer3, this.sequencer4,
-      this.sequencer5, this.sequencer6, this.sequencer7, this.sequencer8);
+  PlayButton(
+      this.sequencer1,this.sequencer2,this.sequencer3,this.sequencer4,this.sequencer5,this.sequencer6,this.sequencer7,this.sequencer8,
+      this.sound1,this.sound2,this.sound3,this.sound4,this.sound5,this.sound6,this.sound7,this.sound8);
 
   Widget build(BuildContext context) {
     return Container(
@@ -437,8 +578,9 @@ class PlayButton extends StatelessWidget {
                 RoundedRectangleBorder(side: BorderSide(color: Colors.black87)),
             color: Colors.white12,
             disabledColor: Colors.white12,
-            onPressed: () => play(sequencer1, sequencer2, sequencer3,
-                sequencer4, sequencer5, sequencer6, sequencer7, sequencer8),
+            onPressed: () => play(
+                sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8,
+                sound1,sound2,sound3,sound4,sound5,sound6,sound7,sound8),
             child: Icon(
               Icons.play_circle_outline,
               color: Colors.black87,
@@ -449,61 +591,151 @@ class PlayButton extends StatelessWidget {
   }
 }
 
-play(sequencer1, sequencer2, sequencer3, sequencer4, sequencer5, sequencer6,
-    sequencer7, sequencer8) {
+play (
+    sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8,
+    sound1,sound2,sound3,sound4,sound5,sound6,sound7,sound8) async{
   var index = 1;
+  String path = await getExternalStorageDirectory();
+  String s1 = "$path/$sound1.wav";
+  String s2 = "$path/$sound2.wav";
+  String s3 = "$path/$sound3.wav";
+  String s4 = "$path/$sound4.wav";
+  String s5 = "$path/$sound5.wav";
+  String s6 = "$path/$sound6.wav";
+  String s7 = "$path/$sound7.wav";
+  String s8 = "$path/$sound8.wav";
 
   Timer.run(() {
     if (sequencer1[0]) {
-      player.play("Kick.wav");
+      if (sound1 == "Kick.wav") {
+        player.play(sound1);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s1, isLocal: true);
+      }
     }
     if (sequencer2[0]) {
-      player.play("Snare.wav");
+      if (sound2 == "Snare.wav") {
+        player.play(sound2);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s2, isLocal: true);
+      }
     }
     if (sequencer3[0]) {
-      player.play("Snare2.wav");
+      if (sound3 == "Snare2.wav") {
+        player.play(sound3);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s3, isLocal: true);
+      }
     }
     if (sequencer4[0]) {
-      player.play("Hihat2.wav");
+      if (sound4 == "Hihat2.wav") {
+        player.play(sound4);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s4, isLocal: true);
+      }
     }
     if (sequencer5[0]) {
-      player.play("Clap.wav");
+      if (sound5 == "Pad1.wav") {
+        player.play(sound5);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s5, isLocal: true);
+      }
     }
     if (sequencer6[0]) {
-      player.play("Bass.wav");
+      if (sound6 == "Pad2.wav") {
+        player.play(sound6);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s6, isLocal: true);
+      }
     }
     if (sequencer7[0]) {
-      player.play("Keys.wav");
+      if (sound7 == "Keys.wav") {
+        player.play(sound7);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s7, isLocal: true);
+      }
     }
     if (sequencer8[0]) {
-      player.play("Hihat.wav");
+      if (sound8 == "Hihat.wav") {
+        player.play(sound8);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s8, isLocal: true);
+      }
     }
   });
 
   Timer.periodic(Duration(milliseconds: 250), (timer) {
     if (sequencer1[index]) {
-      player.play("Kick.wav");
+      if (sound1 == "Kick.wav") {
+        player.play(sound1);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s1, isLocal: true);
+      }
     }
     if (sequencer2[index]) {
-      player.play("Snare.wav");
+      if (sound2 == "Snare.wav") {
+        player.play(sound2);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s2, isLocal: true);
+      }
     }
     if (sequencer3[index]) {
-      player.play("Snare2.wav");
+      if (sound3 == "Snare2.wav") {
+        player.play(sound3);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s3, isLocal: true);
+      }
     }
     if (sequencer4[index]) {
-      player.play("Hihat2.wav");
+      if (sound4 == "Hihat2.wav") {
+        player.play(sound4);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s4, isLocal: true);
+      }
     }
     if (sequencer5[index]) {
-      player.play("Clap.wav");
+      if (sound5 == "Pad1.wav") {
+        player.play(sound5);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s5, isLocal: true);
+      }
     }
     if (sequencer6[index]) {
-      player.play("Bass.wav");
+      if (sound6 == "Pad2.wav") {
+        player.play(sound6);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s6, isLocal: true);
+      }
     }
     if (sequencer7[index]) {
-      player.play("Keys.wav");
+      if (sound7 == "Keys.wav") {
+        player.play(sound7);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s7, isLocal: true);
+      }
     }
     if (sequencer8[index]) {
-      player.play("Hihat.wav");
+      if (sound8 == "Hihat.wav") {
+        player.play(sound8);
+      } else {
+        AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+        audioPlayer.play(s8, isLocal: true);
+      }
     }
     index++;
     if (index == 32) {
@@ -512,53 +744,52 @@ play(sequencer1, sequencer2, sequencer3, sequencer4, sequencer5, sequencer6,
   });
 }
 
-//Reset
 class ResetButton extends StatelessWidget {
-  final sequencer1;
-  final sequencer2;
-  final sequencer3;
-  final sequencer4;
-  final sequencer5;
-  final sequencer6;
-  final sequencer7;
-  final sequencer8;
+  final sequencer1,sequencer2,sequencer3,sequencer4,sequencer5,sequencer6,sequencer7,sequencer8;
   final _MainState parent;
+  final sound1, sound2, sound3, sound4, sound5, sound6, sound7, sound8;
 
   ResetButton(
-      this.sequencer1,
-      this.sequencer2,
-      this.sequencer3,
-      this.sequencer4,
-      this.sequencer5,
-      this.sequencer6,
-      this.sequencer7,
-      this.sequencer8,
-      this.parent);
+    this.sequencer1,this.sequencer2,this.sequencer3,this.sequencer4,this.sequencer5,this.sequencer6,this.sequencer7,this.sequencer8,
+    this.parent,
+    this.sound1,this.sound2,this.sound3,this.sound4,this.sound5,this.sound6,this.sound7,this.sound8,
+  );
 
   Widget build(BuildContext context) {
     return Container(
         width: 80,
         child: Center(
             child: Container(
-          child: FlatButton(
-            shape:
-                RoundedRectangleBorder(side: BorderSide(color: Colors.black87)),
-            color: Colors.white12,
-            disabledColor: Colors.white12,
-            onPressed: () => reset(
-                sequencer1,
-                sequencer2,
-                sequencer3,
-                sequencer4,
-                sequencer5,
-                sequencer6,
-                sequencer7,
-                sequencer8,
-                parent),
+                child: FlatButton(
+          shape:
+              RoundedRectangleBorder(side: BorderSide(color: Colors.black87)),
+          color: Colors.white12,
+          disabledColor: Colors.white12,
+          onPressed: () => reset(sequencer1, sequencer2, sequencer3, sequencer4,
+              sequencer5, sequencer6, sequencer7, sequencer8, parent),
+          child: GestureDetector(
+            onLongPress: () {
+              resetSounds(parent, sound1, sound2, sound3, sound4, sound5,
+                  sound6, sound7, sound8);
+            },
             child: Text("Reset"),
           ),
-        )));
+        ))));
   }
+}
+
+resetSounds(
+    parent, sound1, sound2, sound3, sound4, sound5, sound6, sound7, sound8) {
+  parent.setState(() {
+    parent.sound1 = "Kick.wav";
+    parent.sound2 = "Snare.wav";
+    parent.sound3 = "Snare2.wav";
+    parent.sound4 = "Hihat2.wav";
+    parent.sound5 = "Pad1.wav";
+    parent.sound6 = "Pad2.wav";
+    parent.sound7 = "Keys.wav";
+    parent.sound8 = "Hihat.wav";
+  });
 }
 
 reset(sequencer1, sequencer2, sequencer3, sequencer4, sequencer5, sequencer6,
@@ -574,3 +805,15 @@ reset(sequencer1, sequencer2, sequencer3, sequencer4, sequencer5, sequencer6,
     parent.sequencer8 = List<dynamic>.filled(32, false);
   });
 }
+
+infoToaster(msg) {
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIos: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white70,
+      fontSize: 16.0);
+}
+
