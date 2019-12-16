@@ -28,5 +28,6 @@ Main screen
 ![Screen 2](Docs/Screen2.PNG)
 Sequencer screen
 
-![UML](Docs/UML.png)
+![UML](Docs/UML.png)  
+
 App structure (from Powerpoint presentation)
