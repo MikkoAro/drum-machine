@@ -15,10 +15,15 @@ Features:
 - Record audio as .wav to external storage folder
 - Make rhythmn patterns with sequencer
 - Save rhythmns in SQLite-database
-    - 10 slots for saving
-    - Save/Load/Delete
+  - 10 slots for saving
+  - Save/Load/Delete
 
 Demonstration video link to [youtube](https://youtu.be/twkhECjTBog)
+
+Source code:  
+[Main screen](drum_machine/lib/screens/MainUI.dart)  
+[Sequencer](drum_machine/lib/screens/Sequencer.dart)  
+[Database](drum_machine/lib/SQLite.dart)
 
 ## User Interface
 
